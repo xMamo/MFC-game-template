@@ -50,6 +50,7 @@ void GameWindow::OnPaint() {
 	GetClientRect(&rect);
 
 	CPaintDC dc(this);
+	dc.SetStretchBltMode(HALFTONE);
 
 	CBitmap buffer;
 	if (buffer.CreateCompatibleBitmap(&dc, rect.Width() / 8, rect.Height() / 8) == FALSE) return;
@@ -79,26 +80,19 @@ void GameWindow::render(Gdiplus::Graphics& graphics, float delta) {
 	BYTE keyState[256];
 
 	if (GetKeyboardState(keyState) != FALSE) {
-		Gdiplus::REAL dx = 0;
-		Gdiplus::REAL dy = 0;
+		Gdiplus::REAL dx = 0.0F;
+		Gdiplus::REAL dy = 0.0F;
 
-		if ((keyState['W'] & 0b10000000) || (keyState[VK_UP] & 0b10000000))
-			dy -= sheriffBitmap->GetHeight() * delta;
-
-		if ((keyState['A'] & 0b10000000) || (keyState[VK_LEFT] & 0b10000000))
-			dx -= sheriffBitmap->GetWidth() * delta;
-
-		if ((keyState['S'] & 0b10000000) || (keyState[VK_DOWN] & 0b10000000))
-			dy += sheriffBitmap->GetHeight() * delta;
-
-		if ((keyState['D'] & 0b10000000) || (keyState[VK_RIGHT] & 0b10000000))
-			dx += sheriffBitmap->GetWidth() * delta;
+		if ((keyState['W'] & 0b10000000) || (keyState[VK_UP] & 0b10000000)) --dy;
+		if ((keyState['A'] & 0b10000000) || (keyState[VK_LEFT] & 0b10000000)) --dx;
+		if ((keyState['S'] & 0b10000000) || (keyState[VK_DOWN] & 0b10000000)) ++dy;
+		if ((keyState['D'] & 0b10000000) || (keyState[VK_RIGHT] & 0b10000000)) ++dx;
 
 		auto length = std::sqrt(std::pow(dx, 2) + std::pow(dy, 2));
 
 		if (length > 0) {
-			sheriffX += dx / length;
-			sheriffY += dy / length;
+			sheriffX += delta * (dx / length) * 2.0F * sheriffBitmap->GetWidth();
+			sheriffY += delta * (dy / length) * 2.0F * sheriffBitmap->GetHeight();
 		}
 	}
 
