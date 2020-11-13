@@ -2,21 +2,19 @@
 
 #include "Framework.h"
 #include <chrono>
+#include <memory>
 
 class GameWindow : public CFrameWnd {
 private:
 	std::chrono::high_resolution_clock::time_point start;
-	Gdiplus::Bitmap* sheriffBitmap;
-	Gdiplus::REAL sheriffX;
-	Gdiplus::REAL sheriffY;
+	CD2DBrush* blackBrush;
+	CD2DBitmap* sheriffBitmap;
+	float sheriffX;
+	float sheriffY;
 
 protected:
 	DECLARE_DYNAMIC(GameWindow)
 	DECLARE_MESSAGE_MAP()
 	afx_msg int OnCreate(LPCREATESTRUCT cs);
-	afx_msg void OnDestroy();
-	afx_msg void OnPaint();
-
-private:
-	void render(Gdiplus::Graphics& graphics, float delta);
+	afx_msg LRESULT OnDraw2D(WPARAM wParam, LPARAM lParam);
 };

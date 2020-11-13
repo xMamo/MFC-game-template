@@ -4,6 +4,6 @@
 
 #include <sdkddkver.h>
 #include <afxwin.h>
-#include <atlimage.h>
+#include <d2d1.h>
 
-#include "resource.h"
+#include "Resource.h"

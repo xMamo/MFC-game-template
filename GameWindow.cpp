@@ -1,112 +1,75 @@
 #include "GameWindow.h"
-#include <string>
-#include <cmath>
 
 IMPLEMENT_DYNAMIC(GameWindow, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(GameWindow, CFrameWnd)
 	ON_WM_CREATE()
-	ON_WM_DESTROY()
-	ON_WM_PAINT()
+	ON_REGISTERED_MESSAGE(AFX_WM_DRAW2D, &GameWindow::OnDraw2D)
 END_MESSAGE_MAP()
 
 int GameWindow::OnCreate(LPCREATESTRUCT cs) {
-	auto result = CWnd::OnCreate(cs);
-	if (result != 0) return result;
+	if (CWnd::OnCreate(cs) != 0) return -1;
 
-	auto sheriffResourceInfo = FindResource(NULL, MAKEINTRESOURCE(IDB_SHERIFF), RT_RCDATA);
-	if (sheriffResourceInfo == NULL) return -1;
+	EnableD2DSupport();
+	auto renderTarget = GetRenderTarget();
 
-	auto sheriffResourceData = LoadResource(NULL, sheriffResourceInfo);
-	if (sheriffResourceData == NULL) return -1;
+	blackBrush = new CD2DSolidColorBrush(renderTarget, D2D1::ColorF(D2D1::ColorF::Black));
 
-	sheriffBitmap = Gdiplus::Bitmap::FromStream(SHCreateMemStream(
-		static_cast<BYTE*>(LockResource(sheriffResourceData)),
-		SizeofResource(NULL, sheriffResourceInfo)
-	));
-
-	CRect rect;
-	GetClientRect(&rect);
-
-	sheriffX = (rect.Width() / 8.0F - sheriffBitmap->GetWidth()) / 2.0F;
-	sheriffY = (rect.Height() / 8.0F - sheriffBitmap->GetHeight()) / 2.0F;
+	sheriffBitmap = new CD2DBitmap(renderTarget, IDB_SHERIFF, RT_RCDATA);
+	sheriffX = 0.0F;
+	sheriffY = 0.0F;
 
 	start = std::chrono::high_resolution_clock::now();
 
 	return 0;
 }
 
-void GameWindow::OnDestroy() {
-	delete sheriffBitmap;
-	CWnd::OnDestroy();
-}
-
-void GameWindow::OnPaint() {
+LRESULT GameWindow::OnDraw2D(WPARAM wParam, LPARAM lParam) {
 	auto now = std::chrono::high_resolution_clock::now();
-	auto delta = now - start;
+	auto delta = std::chrono::duration_cast<std::chrono::duration<float>>(now - start).count();
 	start = now;
 
-	CRect rect;
-	GetClientRect(&rect);
+	auto sheriffBitmapSize = sheriffBitmap->GetSize();
 
-	CPaintDC dc(this);
-	dc.SetStretchBltMode(HALFTONE);
-
-	CBitmap buffer;
-	if (buffer.CreateCompatibleBitmap(&dc, rect.Width() / 8, rect.Height() / 8) == FALSE) return;
-
-	CDC mdc;
-	if (mdc.CreateCompatibleDC(&dc) == FALSE) return;
-	if (mdc.SelectObject(buffer) == NULL) return;
-
-	Gdiplus::Graphics graphics(mdc);
-	render(graphics, std::chrono::duration_cast<std::chrono::duration<float>>(delta).count());
-
-	dc.StretchBlt(
-		rect.left,
-		rect.top,
-		rect.Width(),
-		rect.Height(),
-		&mdc,
-		0,
-		0,
-		rect.Width() / 8,
-		rect.Height() / 8,
-		SRCCOPY
-	);
-}
-
-void GameWindow::render(Gdiplus::Graphics& graphics, float delta) {
 	BYTE keyState[256];
 
 	if (GetKeyboardState(keyState) != FALSE) {
-		Gdiplus::REAL dx = 0.0F;
-		Gdiplus::REAL dy = 0.0F;
+		auto dx = 0.0F;
+		auto dy = 0.0F;
 
 		if ((keyState['W'] & 0b10000000) || (keyState[VK_UP] & 0b10000000)) --dy;
 		if ((keyState['A'] & 0b10000000) || (keyState[VK_LEFT] & 0b10000000)) --dx;
 		if ((keyState['S'] & 0b10000000) || (keyState[VK_DOWN] & 0b10000000)) ++dy;
 		if ((keyState['D'] & 0b10000000) || (keyState[VK_RIGHT] & 0b10000000)) ++dx;
 
-		auto length = std::sqrt(std::pow(dx, 2) + std::pow(dy, 2));
+		auto length = sqrtf(powf(dx, 2.0F) + powf(dy, 2.0F));
 
-		if (length > 0) {
-			sheriffX += delta * (dx / length) * 2.0F * sheriffBitmap->GetWidth();
-			sheriffY += delta * (dy / length) * 2.0F * sheriffBitmap->GetHeight();
+		if (length > 0.0F) {
+			sheriffX += delta * ((dx / length) * sheriffBitmapSize.width * 10.0F);
+			sheriffY += delta * ((dy / length) * sheriffBitmapSize.height * 10.0F);
 		}
 	}
 
-	graphics.SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
-	graphics.SetPixelOffsetMode(Gdiplus::PixelOffsetModeHalf);
-	graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintSingleBitPerPixelGridFit);
+	CString string;
+	string.Format(TEXT("%.0f"), roundf(1.0F / delta));
 
-	graphics.Clear(Gdiplus::Color::White);
+	auto renderTarget = reinterpret_cast<CHwndRenderTarget*>(lParam);
+	auto renderTargetSize = renderTarget->GetSize();
 
-	graphics.DrawImage(
+	renderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+	renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+	renderTarget->DrawText(string, D2D1::RectF(0, 0, renderTargetSize.width, renderTargetSize.height), blackBrush);
+
+	auto transform = D2D1::Matrix3x2F::Translation(roundf(sheriffX), roundf(sheriffY));
+	transform = transform * D2D1::Matrix3x2F::Scale(4, 4);
+	renderTarget->SetTransform(transform);
+
+	renderTarget->DrawBitmap(
 		sheriffBitmap,
-		sheriffX,
-		sheriffY,
-		static_cast<Gdiplus::REAL>(sheriffBitmap->GetWidth()),
-		static_cast<Gdiplus::REAL>(sheriffBitmap->GetWidth())
+		CD2DRectF(0, 0, sheriffBitmapSize.width, sheriffBitmapSize.height),
+		1.0F,
+		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR
 	);
+
+	return TRUE;
 }
