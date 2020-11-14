@@ -5,6 +5,7 @@ IMPLEMENT_DYNAMIC(GameWindow, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(GameWindow, CFrameWnd)
 	ON_WM_CREATE()
+	ON_WM_KEYDOWN()
 	ON_REGISTERED_MESSAGE(AFX_WM_DRAW2D, &GameWindow::OnDraw2D)
 END_MESSAGE_MAP()
 
@@ -24,6 +25,17 @@ int GameWindow::OnCreate(LPCREATESTRUCT cs) {
 	start = std::chrono::high_resolution_clock::now();
 
 	return 0;
+}
+
+void GameWindow::OnKeyDown(UINT key, UINT repeatCount, UINT flags) {
+	switch (key) {
+	case VK_ESCAPE:
+		DestroyWindow();
+		break;
+	default:
+		CFrameWnd::OnKeyDown(key, repeatCount, flags);
+		break;
+	}
 }
 
 LRESULT GameWindow::OnDraw2D(WPARAM wParam, LPARAM lParam) {
