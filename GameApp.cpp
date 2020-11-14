@@ -21,7 +21,7 @@ BOOL GameApp::InitInstance() {
 }
 
 BOOL GameApp::OnIdle(LONG count) {
-	CWinApp::OnIdle(count);
 	gameWindow->RedrawWindow();
+	CWinApp::OnIdle(count);
 	return TRUE;
 }
