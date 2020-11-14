@@ -12,9 +12,13 @@ private:
 	float sheriffX;
 	float sheriffY;
 
-protected:
+public:
 	DECLARE_DYNAMIC(GameWindow)
+
+protected:
 	DECLARE_MESSAGE_MAP()
 	afx_msg int OnCreate(LPCREATESTRUCT cs);
 	afx_msg LRESULT OnDraw2D(WPARAM wParam, LPARAM lParam);
+	void update(float delta);
+	void render(float delta, CHwndRenderTarget* renderTarget);
 };
