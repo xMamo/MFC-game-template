@@ -3,7 +3,6 @@
 #include <afxwin.h>
 
 #include <chrono>
-#include <memory>
 
 class GameWindow : public CFrameWnd {
 private:
