@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Framework.h"
 #include "GameWindow.h"
 
 class GameApp : CWinApp {

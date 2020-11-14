@@ -1,4 +1,5 @@
 #include "GameWindow.h"
+#include "Resource.h"
 
 IMPLEMENT_DYNAMIC(GameWindow, CFrameWnd)
 

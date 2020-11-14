@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Framework.h"
+#include <afxwin.h>
+
 #include <chrono>
 #include <memory>
 
