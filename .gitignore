@@ -1,7 +1,6 @@
 /.vs/
-/Debug/
-/Release/
-/x64/
+/Output/
+/Intermediate/
 
 /Game.vcxproj.user
 /Game.aps
