@@ -1,6 +1,9 @@
-/.vs/
-/Output/
-/Intermediate/
+/Debug/
+/Release/
 
-/Game.vcxproj.user
-/Game.aps
+/.vs/
+/ipch/
+
+/Game.opensdf
+/Game.sdf
+/Game.suo

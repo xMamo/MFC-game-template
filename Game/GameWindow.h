@@ -2,11 +2,10 @@
 
 #include <afxwin.h>
 
-#include <chrono>
-
 class GameWindow : public CFrameWnd {
 private:
-	std::chrono::high_resolution_clock::time_point start;
+	float period;
+	LONGLONG start;
 	CD2DBrush* blackBrush;
 	CD2DBitmap* sheriffBitmap;
 	float sheriffX;
