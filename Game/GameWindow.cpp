@@ -51,7 +51,7 @@ LRESULT GameWindow::OnDraw2D(WPARAM wParam, LPARAM lParam) {
 	auto delta = period * (now.QuadPart - start);
 	start = now.QuadPart;
 
-	auto renderTarget = reinterpret_cast<CHwndRenderTarget*>(lParam);
+	auto renderTarget = reinterpret_cast<CRenderTarget*>(lParam);
 	update(delta);
 	render(delta, renderTarget);
 
@@ -80,7 +80,7 @@ void GameWindow::update(float delta) {
 	}
 }
 
-void GameWindow::render(float delta, CHwndRenderTarget* renderTarget) {
+void GameWindow::render(float delta, CRenderTarget* renderTarget) {
 	CString string;
 	string.Format(_T("%.0f"), round(1.0F / delta));
 

@@ -21,5 +21,5 @@ protected:
 	afx_msg LRESULT OnDraw2D(WPARAM wParam, LPARAM lParam);
 
 	void update(float delta);
-	void render(float delta, CHwndRenderTarget* renderTarget);
+	void render(float delta, CRenderTarget* renderTarget);
 };
