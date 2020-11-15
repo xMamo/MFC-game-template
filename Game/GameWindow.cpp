@@ -88,8 +88,6 @@ void GameWindow::render(float delta, CRenderTarget* renderTarget) {
 	auto sheriffBitmapSize = sheriffBitmap->GetSize();
 
 	renderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
-	renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-	renderTarget->DrawText(string, D2D1::RectF(0.0F, 0.0F, renderTargetSize.width, renderTargetSize.height), blackBrush);
 
 	auto transform = D2D1::Matrix3x2F::Translation(round(sheriffX), round(sheriffY));
 	transform = transform * D2D1::Matrix3x2F::Scale(4.0F, 4.0F);
@@ -101,4 +99,7 @@ void GameWindow::render(float delta, CRenderTarget* renderTarget) {
 		1.0F,
 		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR
 	);
+
+	renderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+	renderTarget->DrawText(string, D2D1::RectF(0.0F, 0.0F, renderTargetSize.width, renderTargetSize.height), blackBrush);
 }
