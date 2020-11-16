@@ -70,7 +70,7 @@ void GameWindow::update(float delta) {
 		if ((keyState['S'] & 0x80) || (keyState[VK_DOWN] & 0x80)) ++dy;
 		if ((keyState['D'] & 0x80) || (keyState[VK_RIGHT] & 0x80)) ++dx;
 
-		auto length = sqrt(pow(dx, 2) + pow(dy, 2));
+		auto length = sqrtf(powf(dx, 2.0F) + powf(dy, 2.0F));
 
 		if (length > 0.0F) {
 			auto sheriffBitmapSize = sheriffBitmap->GetSize();
