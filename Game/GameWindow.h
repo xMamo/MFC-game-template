@@ -10,6 +10,7 @@ private:
 	CD2DBitmap* sheriffBitmap;
 	float sheriffX;
 	float sheriffY;
+	float sheriffZ;
 
 public:
 	DECLARE_DYNAMIC(GameWindow)
